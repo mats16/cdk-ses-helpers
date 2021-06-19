@@ -30,6 +30,6 @@ CDK construct to create managed identity of Amazon SES via Amazon WorkMail
 ```ts
 import { ManagedIdentity } from 'cdk-ses-helpers';
 
-const identity = new ManagedIdentity(stack, 'ManagedDomain');
-const domainName = identity.domainName;
+const identity = new ManagedIdentity(stack, 'ManagedDomain', { subDomainName: 'hey-yo' });
+const domainName = identity.domainName;  // return hey-yo.awsapps.com
 ```
