@@ -2,7 +2,7 @@
   "name": "cdk-ses-helpers",
   "repository": {
     "type": "git",
-    "url": "https://github.com/mats.kazuki/cdk-ses-helpers.git"
+    "url": "https://github.com/mats16/cdk-ses-helpers.git"
   },
   "scripts": {
     "clobber": "npx projen clobber",
@@ -31,11 +31,13 @@
     "organization": false
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^1.95.2",
+    "@aws-cdk/assert": "^1.109.0",
+    "@types/aws-lambda": "^8.10.77",
     "@types/jest": "^26.0.23",
     "@types/node": "^10.17.0",
     "@typescript-eslint/eslint-plugin": "^4.27.0",
     "@typescript-eslint/parser": "^4.27.0",
+    "esbuild": "0",
     "eslint": "^7.28.0",
     "eslint-import-resolver-node": "^0.3.4",
     "eslint-import-resolver-typescript": "^2.4.0",
@@ -54,9 +56,28 @@
     "typescript": "^4.3.3"
   },
   "peerDependencies": {
+    "@aws-cdk/aws-iam": "^1.109.0",
+    "@aws-cdk/aws-lambda": "^1.109.0",
+    "@aws-cdk/aws-lambda-nodejs": "^1.109.0",
+    "@aws-cdk/aws-secretsmanager": "^1.109.0",
+    "@aws-cdk/core": "^1.109.0",
     "constructs": "^3.2.27"
   },
-  "bundledDependencies": [],
+  "dependencies": {
+    "@aws-cdk/aws-iam": "^1.109.0",
+    "@aws-cdk/aws-lambda": "^1.109.0",
+    "@aws-cdk/aws-lambda-nodejs": "^1.109.0",
+    "@aws-cdk/aws-secretsmanager": "^1.109.0",
+    "@aws-cdk/core": "^1.109.0",
+    "@aws-sdk/client-secrets-manager": "^3.18.0",
+    "@aws-sdk/client-workmail": "^3.18.0",
+    "axios": "^0.21.1"
+  },
+  "bundledDependencies": [
+    "@aws-sdk/client-secrets-manager",
+    "@aws-sdk/client-workmail",
+    "axios"
+  ],
   "keywords": [
     "cdk"
   ],
