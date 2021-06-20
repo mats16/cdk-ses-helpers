@@ -4,14 +4,10 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
 import * as cdk from '@aws-cdk/core';
 
-const workMailSupportedRegions = [
-  'us-east-1',
-  'us-west-2',
-  'eu-west-1',
-];
+type workMailSupportedRegion = 'us-east-1' | 'us-west-2' | 'eu-west-1';
 
 export interface ManagedIdentityProps {
-  readonly sesRegion?: string;
+  readonly region: workMailSupportedRegion;
   readonly subDomainName?: string;
 };
 
@@ -19,13 +15,10 @@ export class ManagedIdentity extends cdk.Construct {
   domainName: string;
   arn: string;
 
-  constructor(scope: cdk.Construct, id: string, props?: ManagedIdentityProps) {
+  constructor(scope: cdk.Construct, id: string, props: ManagedIdentityProps) {
     super(scope, id);
 
-    const region = props?.sesRegion || cdk.Aws.REGION;
-    if (!workMailSupportedRegions.includes(region)) {
-      console.error(`WorkMaik is not supported in ${region}.`);
-    };
+    const region = props.region;
 
     const createWorkMailOrgHandler = new NodejsFunction(this, 'CreateWorkMailOrgHandler', {
       description: '[cdk-ses-helpers] Create WorkMail Organization Handler',
@@ -66,7 +59,7 @@ export class ManagedIdentity extends cdk.Construct {
       serviceToken: createWorkMailOrgHandler.functionArn,
       properties: {
         Region: region,
-        Alias: props?.subDomainName,
+        Alias: props.subDomainName,
       },
     });
     const workMailAlias = workMailOrg.getAttString('Alias');

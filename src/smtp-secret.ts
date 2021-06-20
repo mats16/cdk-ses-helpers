@@ -6,31 +6,14 @@ import { Secret, SecretProps } from '@aws-cdk/aws-secretsmanager';
 import * as cdk from '@aws-cdk/core';
 import { Construct } from 'constructs';
 
-const sesSupportedRegions = [
-  'us-east-1',
-  'us-east-2',
-  'us-west-1',
-  'us-west-2',
-  'af-south-1',
-  'ap-south-1',
-  'ap-northeast-2',
-  'ap-southeast-1',
-  'ap-southeast-2',
-  'ap-northeast-1',
-  'ca-central-1',
-  'eu-central-1',
-  'eu-west-1',
-  'eu-west-2',
-  'eu-west-3',
-  'eu-north-1',
-];
+type sesSupportedRegion = 'us-east-1' | 'us-east-2' | 'us-west-1' | 'us-west-2' | 'af-south-1' | 'ap-south-1' | 'ap-northeast-2' | 'ap-southeast-1' | 'ap-southeast-2' | 'ap-northeast-1' | 'ca-central-1' | 'eu-central-1' | 'eu-west-1' | 'eu-west-2' | 'eu-west-3' | 'eu-north-1' ;
 
 export interface SmtpSecretProps extends SecretProps {
-  readonly sesRegion?: string;
+  readonly region: sesSupportedRegion;
 };
 
 interface SmtpUserProps extends iam.UserProps {
-  readonly sesRegion: string;
+  readonly region: sesSupportedRegion;
 };
 
 class SmtpUser extends iam.User {
@@ -40,7 +23,7 @@ class SmtpUser extends iam.User {
   constructor(scope: Construct, id: string, props: SmtpUserProps) {
     super(scope, id, props);
 
-    const sesRegion = props.sesRegion;
+    const region = props.region;
     const accountId = cdk.Aws.ACCOUNT_ID;
 
     this.attachInlinePolicy(new iam.Policy(this, 'AmazonSesSendingAccess', {
@@ -48,7 +31,7 @@ class SmtpUser extends iam.User {
       statements: [
         new iam.PolicyStatement({
           actions: ['ses:SendRawEmail'],
-          resources: [`arn:aws:ses:${sesRegion}:${accountId}:*`],
+          resources: [`arn:aws:ses:${region}:${accountId}:*`],
         }),
       ],
     }));
@@ -61,14 +44,10 @@ class SmtpUser extends iam.User {
 
 export class SmtpSecret extends Secret {
 
-  constructor(scope: Construct, id: string, props?: SmtpSecretProps) {
+  constructor(scope: Construct, id: string, props: SmtpSecretProps) {
+    const region = props.region;
 
-    const sesRegion = props?.sesRegion || cdk.Aws.REGION;
-    if (!sesSupportedRegions.includes(sesRegion)) {
-      console.error(`SES is not supported in ${sesRegion}`);
-    };
-
-    const smtpUser = new SmtpUser(scope, 'SmtpUser', { sesRegion });
+    const smtpUser = new SmtpUser(scope, 'SmtpUser', { region });
     props = {
       description: '[cdk-ses-helpers] SES SMTP Credentials',
       ...props,
@@ -105,7 +84,7 @@ export class SmtpSecret extends Secret {
       serviceToken: generatePasswordHandler.functionArn,
       properties: {
         SecretArn: this.secretFullArn!,
-        SesRegion: sesRegion,
+        SesRegion: region,
       },
     });
   };
